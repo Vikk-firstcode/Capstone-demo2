@@ -10,19 +10,19 @@ cp kubectl oc /usr/bin
 Step 2
 
 
-oc new-project team3
+oc new-project demo2
 
-oc adm policy add-scc-to-user anyuid -z default -n team3
-oc adm policy add-scc-to-user hostmount-anyuid -z default -n team3
-oc adm policy add-scc-to-user privileged -z default -n team3
+oc adm policy add-scc-to-user anyuid -z default -n demo2
+oc adm policy add-scc-to-user hostmount-anyuid -z default -n demo2
+oc adm policy add-scc-to-user privileged -z default -n demo2
 
 oc project list
-oc new-project team3
+oc new-project demo2
 
 
 Create below yaml files
 ******************************
-Openshift oc team3
+Openshift oc demo2
 *************************
 
  pv.yaml
@@ -30,22 +30,22 @@ Openshift oc team3
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: team3-jenkins-pv
+  name: demo2-jenkins-pv
 spec:
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /var/lib/jenkins/team3
+    path: /var/lib/jenkins/demo2
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: team3-jenkins-pvc
-  namespace: team3
+  name: demo2-jenkins-pvc
+  namespace: demo2
 spec:
   accessModes:
     - ReadWriteOnce
@@ -60,7 +60,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jenkins
-  namespace: team3
+  namespace: demo2
 spec:
   replicas: 1
   selector:
@@ -85,7 +85,7 @@ spec:
       volumes:
         - name: jenkins-storage
           persistentVolumeClaim:
-            claimName: team3-jenkins-pvc  # Use the PVC defined earlier
+            claimName: demo2-jenkins-pvc  # Use the PVC defined earlier
 			
 **************************
 
@@ -95,7 +95,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: jenkins
-  namespace: team3
+  namespace: demo2
 spec:
   type: ClusterIP
   ports:
@@ -113,7 +113,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: jenkins
-  namespace: team3
+  namespace: demo2
 spec:
   to:
     kind: Service
@@ -140,7 +140,7 @@ oc new-app https://github.com/gopih2022/ruby-ex.git
 
 
 oc new-app openshift/ruby:2.5-ubi8~https://github.com/gopih2022/ruby-ex.git
-oc get is -n team3 --selector role=builder
+oc get is -n demo2 --selector role=builder
  oc logs -f buildconfig/ruby-ex
  
  
@@ -159,14 +159,14 @@ oc get is -n team3 --selector role=builder
  
  oc get routes
  
- --- open route  os-sample-python-team3.apps.natwest.priartw.com in browser for expected result
+ --- open route  os-sample-python-demo2.apps.natwest.priartw.com in browser for expected result
  
  
- oc run team3app --image=nginx
- oc expose pod/team3app --port=80
- oc expose svc/team3app 
+ oc run demo2-php --image=nginx
+ oc expose pod/demo2app --port=80
+ oc expose svc/demo2app 
   oc get routes
-  -- open team3app-team3.apps.natwest.priartw.com in terminal for nginx result
+  -- open demo2app-demo2.apps.natwest.priartw.com in terminal for nginx result
   
   oc start-build myapp  -- start build 
   oc rollout restart deploy myapp  -- restart build
@@ -184,6 +184,6 @@ oc get is -n team3 --selector role=builder
    oc delete namespace openshift-operators-redhat
  
  
- oc adm policy add-scc-to-user anyuid -z default -n team3-pro-efk
-oc adm policy add-scc-to-user hostmount-anyuid -z default -n team3-pro-efk
-oc adm policy add-scc-to-user privileged -z default -n team3-pro-efk
+ oc adm policy add-scc-to-user anyuid -z default -n demo2-pro-efk
+oc adm policy add-scc-to-user hostmount-anyuid -z default -n demo2-pro-efk
+oc adm policy add-scc-to-user privileged -z default -n demo2-pro-efk
